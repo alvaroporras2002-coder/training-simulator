@@ -1,13 +1,874 @@
 <!doctype html>
-<html>
+<html lang="es">
 <head>
   <meta charset="utf-8">
-  <title>Training Simulator</title>
-  <meta http-equiv="refresh" content="0; url=./index(20260821-210417)%20(1).html">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DoorDash Training - Registro</title>
+
+  <style>
+    :root{
+      --red:#eb1700;
+      --ink:#171717;
+      --muted:#666;
+      --line:#e5e5e5;
+      --soft:#f7f7f7;
+      --panel:#fff;
+      --green:#16833b;
+      --danger:#b42318;
+      --purple:#7047eb;
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      min-height:100vh;
+      background:
+        radial-gradient(circle at 90% 10%, rgba(112,71,235,.22), transparent 35%),
+        radial-gradient(circle at 10% 90%, rgba(235,23,0,.18), transparent 35%),
+        #101114;
+      color:var(--ink);
+      font-family:Arial,Helvetica,sans-serif;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+    }
+
+    .card{
+      width:min(760px,100%);
+      background:#fff;
+      border-radius:22px;
+      overflow:hidden;
+      box-shadow:0 30px 90px rgba(0,0,0,.35);
+    }
+
+    .hero{
+      padding:34px 38px 30px;
+      color:#fff;
+      background:linear-gradient(135deg,#eb1700 0%,#ff573f 45%,#7047eb 100%);
+    }
+
+    .eyebrow{
+      font-size:12px;
+      font-weight:800;
+      letter-spacing:1.5px;
+      text-transform:uppercase;
+      opacity:.95;
+      margin-bottom:14px;
+    }
+
+    h1{
+      margin:0;
+      font-size:34px;
+      line-height:1.08;
+    }
+
+    .hero p{
+      margin:12px 0 0;
+      font-size:15px;
+      line-height:1.55;
+      max-width:620px;
+      opacity:.96;
+    }
+
+    .body{
+      padding:30px 38px 34px;
+    }
+
+    .status{
+      padding:12px 14px;
+      border-radius:10px;
+      margin-bottom:20px;
+      font-size:14px;
+      line-height:1.45;
+      display:none;
+    }
+
+    .status.show{display:block}
+
+    .status.error{
+      background:#fff1f0;
+      color:var(--danger);
+      border:1px solid #f3b6b0;
+    }
+
+    .status.info{
+      background:#eef5ff;
+      color:#194f8a;
+      border:1px solid #c9dcf8;
+    }
+
+    .status.success{
+      background:#edf9f1;
+      color:#126b30;
+      border:1px solid #b7e4c6;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:16px;
+    }
+
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:7px;
+    }
+
+    .field.full{
+      grid-column:1/-1;
+    }
+
+    label{
+      font-size:13px;
+      font-weight:700;
+      color:#222;
+    }
+
+    input,select{
+      width:100%;
+      border:1px solid #d7d7d7;
+      border-radius:10px;
+      padding:13px 14px;
+      font:inherit;
+      background:#fff;
+      color:#171717;
+      outline:none;
+    }
+
+    input:focus,select:focus{
+      border-color:#888;
+      box-shadow:0 0 0 3px rgba(0,0,0,.05);
+    }
+
+    .actions{
+      margin-top:22px;
+      display:flex;
+      justify-content:flex-end;
+    }
+
+    button{
+      border:0;
+      border-radius:999px;
+      padding:13px 22px;
+      font-weight:800;
+      cursor:pointer;
+      background:var(--red);
+      color:white;
+      min-width:190px;
+    }
+
+    button:disabled{
+      opacity:.55;
+      cursor:not-allowed;
+    }
+
+    .note{
+      margin-top:18px;
+      color:#666;
+      font-size:12px;
+      line-height:1.6;
+    }
+
+    .hidden{
+      display:none!important;
+    }
+
+    .loading{
+      text-align:center;
+      padding:50px 20px;
+    }
+
+    .spinner{
+      width:34px;
+      height:34px;
+      border:4px solid #ececec;
+      border-top-color:var(--red);
+      border-radius:50%;
+      animation:spin .8s linear infinite;
+      margin:0 auto 15px;
+    }
+
+    @keyframes spin{
+      to{transform:rotate(360deg)}
+    }
+
+    @media(max-width:700px){
+      .hero,.body{
+        padding-left:22px;
+        padding-right:22px;
+      }
+
+      .grid{
+        grid-template-columns:1fr;
+      }
+
+      .field.full{
+        grid-column:auto;
+      }
+
+      h1{
+        font-size:28px;
+      }
+
+      .actions{
+        display:block;
+      }
+
+      button{
+        width:100%;
+      }
+    }
+  </style>
 </head>
+
 <body>
-<script>
-  window.location.replace("./index(20260821-210417)%20(1).html");
-</script>
+
+  <div class="card">
+
+    <div class="hero">
+      <div class="eyebrow">DOORDASH · TRAINING</div>
+      <h1>Welcome to Training</h1>
+      <p>
+        Complete your registration once. Your information will be remembered
+        so you can return to the training without filling out the form again.
+      </p>
+    </div>
+
+    <div id="loadingScreen" class="body">
+      <div class="loading">
+        <div class="spinner"></div>
+        <strong>Checking your registration...</strong>
+      </div>
+    </div>
+
+    <div id="registerScreen" class="body hidden">
+
+      <div id="status" class="status"></div>
+
+      <form id="registrationForm">
+
+        <div class="grid">
+
+          <div class="field full">
+            <label for="fullName">Full name *</label>
+            <input id="fullName" type="text" autocomplete="name" required>
+          </div>
+
+          <div class="field">
+            <label for="email">Work email *</label>
+            <input id="email" type="email" autocomplete="email" required>
+          </div>
+
+          <div class="field">
+            <label for="employeeId">Employee ID</label>
+            <input id="employeeId" type="text" autocomplete="off">
+          </div>
+
+          <div class="field">
+            <label for="team">Team *</label>
+            <input id="team" type="text" required>
+          </div>
+
+          <div class="field">
+            <label for="country">Country / Location *</label>
+            <input id="country" type="text" required>
+          </div>
+
+          <div class="field">
+            <label for="language">Language *</label>
+            <select id="language" required>
+              <option value="">Select...</option>
+              <option value="English">English</option>
+              <option value="Spanish">Spanish</option>
+            </select>
+          </div>
+
+        </div>
+
+        <div class="actions">
+          <button id="registerButton" type="submit">
+            Continue to Training
+          </button>
+        </div>
+
+        <div class="note">
+          Your registration information is used to manage training access and
+          participation. Your password is never requested or stored here.
+        </div>
+
+      </form>
+    </div>
+
+    <div id="blockedScreen" class="body hidden">
+      <div id="blockedStatus" class="status error show"></div>
+    </div>
+
+  </div>
+
+  <!-- Firebase configuration created in your repository -->
+  <script src="./firebase-config.js"></script>
+
+  <script type="module">
+
+    import { initializeApp }
+      from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
+
+    import {
+      getAuth,
+      signInAnonymously,
+      onAuthStateChanged,
+      setPersistence,
+      browserLocalPersistence
+    } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
+
+    import {
+      getFirestore,
+      doc,
+      getDoc,
+      setDoc,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
+
+
+    const config = window.TRAINING_FIREBASE_CONFIG;
+    const settings = window.TRAINING_APP_SETTINGS || {};
+
+    const SIMULATOR_URL =
+      "./index(20260821-210417)%20(1).html";
+
+    const REGISTRATION_COLLECTION =
+      settings.registrationsCollection || "trainingRegistrations";
+
+    const ACCESS_COLLECTION =
+      settings.accessCollection || "trainingAccess";
+
+    const STORAGE_KEY =
+      settings.registrationStorageKey || "dd_training_registration_v2";
+
+
+    const loadingScreen =
+      document.getElementById("loadingScreen");
+
+    const registerScreen =
+      document.getElementById("registerScreen");
+
+    const blockedScreen =
+      document.getElementById("blockedScreen");
+
+    const registrationForm =
+      document.getElementById("registrationForm");
+
+    const registerButton =
+      document.getElementById("registerButton");
+
+    const statusBox =
+      document.getElementById("status");
+
+    const blockedStatus =
+      document.getElementById("blockedStatus");
+
+
+    function showStatus(message, type="info"){
+      statusBox.textContent = message;
+      statusBox.className = "status show " + type;
+    }
+
+
+    function showRegistration(){
+      loadingScreen.classList.add("hidden");
+      blockedScreen.classList.add("hidden");
+      registerScreen.classList.remove("hidden");
+    }
+
+
+    function showBlocked(message){
+      loadingScreen.classList.add("hidden");
+      registerScreen.classList.add("hidden");
+      blockedScreen.classList.remove("hidden");
+      blockedStatus.textContent = message;
+    }
+
+
+    function saveLocalRegistration(data){
+      try{
+        localStorage.setItem(
+          STORAGE_KEY,
+          JSON.stringify(data)
+        );
+      }catch(e){
+        console.warn("Local storage unavailable",e);
+      }
+    }
+
+
+    function getLocalRegistration(){
+      try{
+        const raw = localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : null;
+      }catch(e){
+        return null;
+      }
+    }
+
+
+    function validEmail(email){
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
+
+    function redirectToTraining(){
+      window.location.replace(SIMULATOR_URL);
+    }
+
+
+    async function checkExistingRegistration(user){
+
+      const registrationRef =
+        doc(
+          db,
+          REGISTRATION_COLLECTION,
+          user.uid
+        );
+
+      const registrationSnap =
+        await getDoc(registrationRef);
+
+
+      const accessRef =
+        doc(
+          db,
+          ACCESS_COLLECTION,
+          user.uid
+        );
+
+      const accessSnap =
+        await getDoc(accessRef);
+
+
+      if(accessSnap.exists()){
+
+        const access =
+          accessSnap.data();
+
+        if(access.status === "blocked"){
+
+          showBlocked(
+            access.message ||
+            "Your training access has been blocked. Please contact your administrator."
+          );
+
+          return true;
+        }
+
+        if(access.requireRegistration === true){
+
+          showRegistration();
+
+          const local =
+            getLocalRegistration();
+
+          if(local){
+            fillForm(local);
+          }
+
+          return true;
+        }
+      }
+
+
+      if(registrationSnap.exists()){
+
+        const data =
+          registrationSnap.data();
+
+        saveLocalRegistration({
+          ...data,
+          uid:user.uid
+        });
+
+        redirectToTraining();
+
+        return true;
+      }
+
+
+      const local =
+        getLocalRegistration();
+
+      if(local){
+
+        showStatus(
+          "We found a saved registration. Verifying it...",
+          "info"
+        );
+
+        try{
+
+          await setDoc(
+            registrationRef,
+            {
+              ...local,
+              uid:user.uid,
+              updatedAt:serverTimestamp(),
+              lastSeenAt:serverTimestamp()
+            },
+            { merge:true }
+          );
+
+          redirectToTraining();
+
+          return true;
+
+        }catch(error){
+
+          console.warn(
+            "Could not restore local registration",
+            error
+          );
+        }
+      }
+
+      return false;
+    }
+
+
+    function fillForm(data){
+
+      document.getElementById("fullName").value =
+        data.fullName || "";
+
+      document.getElementById("email").value =
+        data.email || "";
+
+      document.getElementById("employeeId").value =
+        data.employeeId || "";
+
+      document.getElementById("team").value =
+        data.team || "";
+
+      document.getElementById("country").value =
+        data.country || "";
+
+      document.getElementById("language").value =
+        data.language || "";
+    }
+
+
+    let app;
+    let auth;
+    let db;
+
+    try{
+
+      if(!config || !config.apiKey){
+
+        throw new Error(
+          "Firebase configuration is missing."
+        );
+      }
+
+      app =
+        initializeApp(config);
+
+      auth =
+        getAuth(app);
+
+      db =
+        getFirestore(app);
+
+    }catch(error){
+
+      loadingScreen.classList.add("hidden");
+      registerScreen.classList.remove("hidden");
+
+      showStatus(
+        "Firebase could not be initialized. Please contact the administrator.",
+        "error"
+      );
+
+      console.error(error);
+    }
+
+
+    async function initializeUser(){
+
+      if(!auth || !db){
+        return;
+      }
+
+      try{
+
+        await setPersistence(
+          auth,
+          browserLocalPersistence
+        );
+
+        if(!auth.currentUser){
+
+          await signInAnonymously(auth);
+
+        }
+
+      }catch(error){
+
+        console.error(
+          "Authentication initialization failed",
+          error
+        );
+
+        loadingScreen.classList.add("hidden");
+        registerScreen.classList.remove("hidden");
+
+        showStatus(
+          "We could not connect to the training service. Please refresh the page.",
+          "error"
+        );
+      }
+    }
+
+
+    onAuthStateChanged(
+      auth,
+      async (user)=>{
+
+        if(!user){
+          return;
+        }
+
+        try{
+
+          const handled =
+            await checkExistingRegistration(user);
+
+          if(!handled){
+            showRegistration();
+
+            const local =
+              getLocalRegistration();
+
+            if(local){
+              fillForm(local);
+            }
+          }
+
+        }catch(error){
+
+          console.error(
+            "Registration check failed",
+            error
+          );
+
+          showRegistration();
+
+          showStatus(
+            "We could not verify your registration. Please complete the form again.",
+            "error"
+          );
+        }
+
+      }
+    );
+
+
+    registrationForm.addEventListener(
+      "submit",
+      async(event)=>{
+
+        event.preventDefault();
+
+        const user =
+          auth.currentUser;
+
+        if(!user){
+
+          showStatus(
+            "Your session is still loading. Please try again.",
+            "error"
+          );
+
+          return;
+        }
+
+
+        const fullName =
+          document.getElementById("fullName")
+            .value.trim();
+
+        const email =
+          document.getElementById("email")
+            .value.trim()
+            .toLowerCase();
+
+        const employeeId =
+          document.getElementById("employeeId")
+            .value.trim();
+
+        const team =
+          document.getElementById("team")
+            .value.trim();
+
+        const country =
+          document.getElementById("country")
+            .value.trim();
+
+        const language =
+          document.getElementById("language")
+            .value;
+
+
+        if(!fullName){
+
+          showStatus(
+            "Please enter your full name.",
+            "error"
+          );
+
+          return;
+        }
+
+
+        if(!validEmail(email)){
+
+          showStatus(
+            "Please enter a valid work email.",
+            "error"
+          );
+
+          return;
+        }
+
+
+        if(!team || !country || !language){
+
+          showStatus(
+            "Please complete all required fields.",
+            "error"
+          );
+
+          return;
+        }
+
+
+        registerButton.disabled = true;
+        registerButton.textContent = "Saving...";
+
+
+        try{
+
+          const registration = {
+
+            uid:user.uid,
+
+            fullName,
+            email,
+            employeeId,
+            team,
+            country,
+            language,
+
+            status:"active",
+
+            registeredAt:serverTimestamp(),
+            updatedAt:serverTimestamp(),
+            lastSeenAt:serverTimestamp(),
+
+            source:"training-simulator",
+            registrationVersion:
+              settings.registrationVersion || 2
+          };
+
+
+          await setDoc(
+            doc(
+              db,
+              REGISTRATION_COLLECTION,
+              user.uid
+            ),
+            registration,
+            {merge:true}
+          );
+
+
+          await setDoc(
+            doc(
+              db,
+              ACCESS_COLLECTION,
+              user.uid
+            ),
+            {
+              status:"active",
+              updatedAt:serverTimestamp()
+            },
+            {merge:true}
+          ).catch(
+            (error)=>{
+              console.info(
+                "Access record is admin-managed:",
+                error
+              );
+            }
+          );
+
+
+          const localData = {
+
+            uid:user.uid,
+
+            fullName,
+            email,
+            employeeId,
+            team,
+            country,
+            language,
+
+            status:"active",
+
+            source:"training-simulator",
+            registrationVersion:
+              settings.registrationVersion || 2
+          };
+
+
+          saveLocalRegistration(
+            localData
+          );
+
+
+          showStatus(
+            "Registration saved. Opening training...",
+            "success"
+          );
+
+
+          setTimeout(
+            redirectToTraining,
+            500
+          );
+
+        }catch(error){
+
+          console.error(error);
+
+          showStatus(
+            "We could not save your registration. Please try again.",
+            "error"
+          );
+
+          registerButton.disabled = false;
+          registerButton.textContent =
+            "Continue to Training";
+        }
+
+      }
+    );
+
+
+    initializeUser();
+
+  </script>
+
 </body>
 </html>
